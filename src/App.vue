@@ -1,30 +1,74 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import Editor from "./components/editor/Editor.vue";
+
+const PLACEHOLDERS = [
+  {
+    id: 1,
+    name: "address",
+    title: "Address",
+    description: "Customer Support correspondence address.",
+  },
+  {
+    id: 2,
+    name: "assignee",
+    title: "Assignee Name",
+    description: "Ticket assignee name.",
+  },
+  {
+    id: 3,
+    name: "deadline",
+    title: "Deadline Time",
+    description: "Utmost time to which technician should handle the issue.",
+  },
+  {
+    id: 4,
+    name: "department",
+    title: "Department Name",
+    description: "Department name responsible for servicing this ticket.",
+  },
+  {
+    id: 5,
+    name: "caseid",
+    title: "Case ID",
+    description: "Unique case number used to distinguish tickets.",
+  },
+  {
+    id: 6,
+    name: "casename",
+    title: "Case Name",
+    description: "Name of the ticket provided by the user.",
+  },
+  {
+    id: 7,
+    name: "contact",
+    title: "Contact E-mail",
+    description: "Customer Support contact e-mail address.",
+  },
+  {
+    id: 8,
+    name: "customer",
+    title: "Customer Name",
+    description: "Receipent of your response.",
+  },
+  {
+    id: 9,
+    name: "hotline",
+    title: "Hotline Number",
+    description: "Customer Support Hotline number.",
+  },
+  {
+    id: 10,
+    name: "technician",
+    title: "Technician Name",
+    description: "Technician which will handle this ticket.",
+  },
+];
 </script>
 
 <template>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <HelloWorld msg="Vite + Vue" />
+  <Editor :suggestions="PLACEHOLDERS" />
 </template>
 
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
+
 </style>
