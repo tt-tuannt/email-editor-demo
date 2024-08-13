@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Plugin, CustomRTE } from "grapesjs";
 import type CKE from "ckeditor4";
 
@@ -159,86 +160,89 @@ const plugin: Plugin<PluginOptions> = (editor, options = {}) => {
       }
 
       // Init CKEDITOR
-      ck.plugins.add( 'customautocomplete', {
-      		requires: 'autocomplete',
-      
-      		onLoad: function() {
-            console.log('onLoad')
-            if(!ck) return;
-      			const View = (ck.plugins as any).autocomplete.view,
-      				Autocomplete = (ck.plugins as any).autocomplete;
+      if (!ck.plugins.customAutocomplete) {
+        ck.plugins.add("customautocomplete", {
+          requires: "autocomplete",
 
-      			function CustomView( editor: any ) {
-      				// Call the parent class constructor.
-      				View.call( this, editor );
-      			}
-      			// Inherit the view methods.
-      			CustomView.prototype = ck.tools.prototypedCopy( View.prototype );
-      
-      			// Change the positioning of the panel, so it is stretched
-      			// to 100% of the editor container width and is positioned
-      			// relative to the editor container.
-      			CustomView.prototype.updatePosition = function( range: any ) {
-              console.log('CustomView.prototype.updatePosition')
-      				const caretRect = (this as any).getViewPosition( range ),
-      					container = (this as any).editor.container;
-              console.log('container.$.offsetLeft', container.$.offsetLeft)
-      				(this as any).setPosition( {
-      					// Position the panel relative to the editor container.
-      					left: container.$.offsetLeft,
-      					top: caretRect.top,
-      					bottom: caretRect.bottom
-      				} );
-      				// Stretch the panel to 100% of the editor container width.
-      				(this as any).element.setStyle( 'width', container.getSize( 'width' ) + 'px' );
-      			};
-      
-      			function CustomAutocomplete( editor: any, configDefinition: any ) {
-      				// Call the parent class constructor.
-      				Autocomplete.call( this, editor, configDefinition );
-      			}
-      			// Inherit the autocomplete methods.
-      			CustomAutocomplete.prototype = ck.tools.prototypedCopy( Autocomplete.prototype );
-      
-      			CustomAutocomplete.prototype.getView = function() {
-              console.log('CustomAutocomplete.prototype.getView')
-      				return new CustomView( this.editor );
-      			}
-      
-      			// Expose the custom autocomplete so it can be used later.
-      			ck.plugins.customAutocomplete = CustomAutocomplete;
-      		}
-      	} );
-      function textTestCallback( range: any ) {
-        if ( !range.collapsed ) {
+          onLoad: function () {
+            console.log("onLoad");
+            if (!ck) return;
+            const View = ck.plugins.autocomplete.view,
+              Autocomplete = ck.plugins.autocomplete;
+
+            function CustomView(editor: any) {
+              // Call the parent class constructor.
+              View.call(this, editor);
+            }
+            // Inherit the view methods.
+            CustomView.prototype = ck.tools.prototypedCopy(View.prototype);
+
+            // Change the positioning of the panel, so it is stretched
+            // to 100% of the editor container width and is positioned
+            // relative to the editor container.
+            CustomView.prototype.updatePosition = function (range: any) {
+              const caretRect = this.getViewPosition(range);
+              const container = this.editor.container;
+              console.log("container.$.offsetLeft", container.$.offsetLeft);
+              this.setPosition({
+                // Position the panel relative to the editor container.
+                left: container.$.offsetLeft,
+                top: caretRect.top,
+                bottom: caretRect.bottom,
+              });
+              // Stretch the panel to 100% of the editor container width.
+              this.element.setStyle("width", container.getSize("width") + "px");
+            };
+
+            function CustomAutocomplete(editor: any, configDefinition: any) {
+              // Call the parent class constructor.
+              Autocomplete.call(this, editor, configDefinition);
+            }
+            // Inherit the autocomplete methods.
+            CustomAutocomplete.prototype = ck.tools.prototypedCopy(
+              Autocomplete.prototype
+            );
+
+            CustomAutocomplete.prototype.getView = function () {
+              console.log("CustomAutocomplete.prototype.getView");
+              return new CustomView(this.editor);
+            };
+
+            // Expose the custom autocomplete so it can be used later.
+            ck.plugins.customAutocomplete = CustomAutocomplete;
+          },
+        });
+      }
+
+      function textTestCallback(range: any) {
+        if (!range.collapsed) {
           return null;
         }
 
-        return (ck!.plugins as any).textMatch.match( range, matchCallback );
+        return (ck!.plugins as any).textMatch.match(range, matchCallback);
       }
 
-      function matchCallback( text: string, offset: number ) {
+      function matchCallback(text: string, offset: number) {
         const pattern = /\[{2}([A-z]|\])*$/,
-          match = text.slice( 0, offset )
-          .match( pattern );
+          match = text.slice(0, offset).match(pattern);
 
-        if ( !match ) {
+        if (!match) {
           return null;
         }
 
         return {
           start: match.index,
-          end: offset
+          end: offset,
         };
       }
 
-      function dataCallback( matchInfo: any, callback: any ) {
-        const data = suggestions.filter( function( item: any ) {
-          const itemName = '[[' + item.name + ']]';
-          return itemName.indexOf( matchInfo.query.toLowerCase() ) == 0;
-        } );
+      function dataCallback(matchInfo: any, callback: any) {
+        const data = suggestions.filter(function (item: any) {
+          const itemName = "[[" + item.name + "]]";
+          return itemName.indexOf(matchInfo.query.toLowerCase()) == 0;
+        });
 
-        callback( data );
+        callback(data);
       }
 
       rte = ck!.inline(el, {
@@ -259,12 +263,15 @@ const plugin: Plugin<PluginOptions> = (editor, options = {}) => {
                 "</li>",
               outputTemplate = "[[{title}]]<span>&nbsp;</span>";
 
-            const autocomplete = new (ck!.plugins as any).customAutocomplete(evt.editor, {
-              textTestCallback: textTestCallback,
-              dataCallback: dataCallback,
-              itemTemplate: itemTemplate,
-              outputTemplate: outputTemplate,
-            });
+            const autocomplete = new (ck!.plugins as any).customAutocomplete(
+              evt.editor,
+              {
+                textTestCallback: textTestCallback,
+                dataCallback: dataCallback,
+                itemTemplate: itemTemplate,
+                outputTemplate: outputTemplate,
+              }
+            );
 
             // Override default getHtmlToInsert to enable rich content output.
             autocomplete.getHtmlToInsert = function (item: any) {
@@ -328,11 +335,11 @@ const plugin: Plugin<PluginOptions> = (editor, options = {}) => {
 
   // Update RTE toolbar position
   editor.on("rteToolbarPosUpdate", (pos: any) => {
-    const { elRect } = pos;
+    const { elRect, targetWidth } = pos;
 
     switch (opts.position) {
       case "center":
-        pos.left = elRect.width / 2 - pos.targetWidth / 2;
+        pos.left = elRect.width / 2 - targetWidth / 2;
         break;
       case "right":
         pos.left = "";
